@@ -6,6 +6,10 @@
 public partial class CustomerRole : BaseEntity
 {
     /// <summary>
+    /// Gets or sets the price list identifier
+    /// </summary>
+    public int? PriceListId { get; set; }
+    /// <summary>
     /// Gets or sets the customer role name
     /// </summary>
     public string Name { get; set; }

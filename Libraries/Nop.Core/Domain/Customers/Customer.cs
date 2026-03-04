@@ -12,7 +12,10 @@ public partial class Customer : BaseEntity, ISoftDeletedEntity
     {
         CustomerGuid = Guid.NewGuid();
     }
-
+    /// <summary>
+    /// Gets or sets the price list identifier
+    /// </summary>
+    public int? PriceListId { get; set; }
     /// <summary>
     /// Gets or sets the customer GUID
     /// </summary>
