@@ -27,6 +27,7 @@ public partial class PriceCalculationService : IPriceCalculationService
     protected readonly IProductAttributeParser _productAttributeParser;
     protected readonly IProductService _productService;
     protected readonly IStaticCacheManager _staticCacheManager;
+    protected readonly IPriceListService _priceService;
 
     #endregion
 
@@ -252,7 +253,33 @@ public partial class PriceCalculationService : IPriceCalculationService
     #endregion
 
     #region Methods
+    public virtual async Task<decimal?> GetPriceListPriceAsync(Product product, Customer customer)
+    {
+        if (product == null || customer == null)
+            return null;
 
+        if (customer.PriceListId.HasValue)
+        {
+            var customPrice = await _priceService.GetPriceByProductAndPriceListAsync(product.Id, customer.PriceListId.Value);
+
+            if (customPrice.HasValue)
+                return customPrice;
+        }
+
+        var customerRoles = await _customerService.GetCustomerRolesAsync(customer);
+
+        foreach (var role in customerRoles.Where(cr => cr.Active))
+        {
+            if (role.PriceListId.HasValue)
+            {
+                var rolePrice = await _priceService.GetPriceByProductAndPriceListAsync(product.Id, role.PriceListId.Value);
+                if (rolePrice.HasValue)
+                    return rolePrice; // Повертаємо першу знайдену ціну за роллю
+            }
+        }
+
+        return null;
+    }
     /// <summary>
     /// Gets the final price
     /// </summary>
