@@ -164,44 +164,58 @@ $RECYCLE.BIN/
 
 #######################
 ## nopCommerce specific
-###########
+#######################
 glob:*.user
 *.patch
 *.hg
-src/Presentation/Nop.Web/.config/*
-src/Presentation/Nop.Web/App_Data/Gmail/AuthStore/*
-!src/Presentation/Nop.Web/App_Data/Gmail/AuthStore/Index.htm
-src/Presentation/Nop.Web/App_Data/browscap.xml
-src/Presentation/Nop.Web/App_Data/additional.crawlers.xml
-src/Presentation/Nop.Web/App_Data/installedPlugins.json
-src/Presentation/Nop.Web/App_Data/plugins.json
-src/Presentation/Nop.Web/App_Data/dataSettings.json
-src/Presentation/Nop.Web/App_Data/appsettings.json
-src/Presentation/Nop.Web/App_Data/TempUploads/*
-!src/Presentation/Nop.Web/App_Data/TempUploads/Index.htm
-src/Presentation/Nop.Web/App_Data/DataProtectionKeys/*
-!src/Presentation/Nop.Web/App_Data/DataProtectionKeys/Index.htm
-src/Presentation/Nop.Web/node_modules/*
-src/Presentation/Nop.Web/Plugins/*
-!src/Presentation/Nop.Web/Plugins/Uploaded
-src/Presentation/Nop.Web/Plugins/Uploaded/*
-!src/Presentation/Nop.Web/Plugins/Uploaded/placeholder.txt
-src/Presentation/Nop.Web/wwwroot/.well-known/*
-!src/Presentation/Nop.Web/wwwroot/.well-known/Index.htm
-src/Presentation/Nop.Web/wwwroot/bundles/*
-!src/Presentation/Nop.Web/wwwroot/bundles/Index.htm
-src/Presentation/Nop.Web/wwwroot/db_backups/*.bak
-!src/Presentation/Nop.Web/wwwroot/db_backups/Index.htm
-src/Presentation/Nop.Web/wwwroot/images/thumbs/*
-!src/Presentation/Nop.Web/wwwroot/images/thumbs/placeholder.txt
-src/Presentation/Nop.Web/wwwroot/images/uploaded/*
-!src/Presentation/Nop.Web/wwwroot/images/uploaded/placeholder.txt
-src/Presentation/Nop.Web/wwwroot/files/exportimport/*
-!src/Presentation/Nop.Web/wwwroot/files/exportimport/Index.htm
-src/Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/*
-!src/Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/en/
-!src/Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/main.zip
-src/Presentation/Nop.Web/wwwroot/sitemaps/*
-!src/Presentation/Nop.Web/wwwroot/sitemaps/Index.htm
-src/packages/*
-src/Tests/Nop.Tests/Connections.resx
+
+# Configuration & secrets
+Presentation/Nop.Web/.config/*
+Presentation/Nop.Web/App_Data/appsettings.json
+Presentation/Nop.Web/App_Data/dataSettings.json
+Presentation/Nop.Web/App_Data/plugins.json
+Presentation/Nop.Web/App_Data/installedPlugins.json
+
+# Logs
+Presentation/Nop.Web/logs/
+Presentation/Nop.Web/App_Data/logs/
+
+# App_Data details
+Presentation/Nop.Web/App_Data/Gmail/AuthStore/*
+!Presentation/Nop.Web/App_Data/Gmail/AuthStore/Index.htm
+Presentation/Nop.Web/App_Data/browscap.xml
+Presentation/Nop.Web/App_Data/additional.crawlers.xml
+Presentation/Nop.Web/App_Data/TempUploads/*
+!Presentation/Nop.Web/App_Data/TempUploads/Index.htm
+Presentation/Nop.Web/App_Data/DataProtectionKeys/*
+!Presentation/Nop.Web/App_Data/DataProtectionKeys/Index.htm
+
+# Plugins (compiled and bin)
+Presentation/Nop.Web/Plugins/*
+!Presentation/Nop.Web/Plugins/Uploaded
+Presentation/Nop.Web/Plugins/Uploaded/*
+!Presentation/Nop.Web/Plugins/Uploaded/placeholder.txt
+
+# Web assets & generated content
+Presentation/Nop.Web/node_modules/
+Presentation/Nop.Web/wwwroot/.well-known/*
+!Presentation/Nop.Web/wwwroot/.well-known/Index.htm
+Presentation/Nop.Web/wwwroot/bundles/*
+!Presentation/Nop.Web/wwwroot/bundles/Index.htm
+Presentation/Nop.Web/wwwroot/db_backups/*.bak
+!Presentation/Nop.Web/wwwroot/db_backups/Index.htm
+Presentation/Nop.Web/wwwroot/images/thumbs/*
+!Presentation/Nop.Web/wwwroot/images/thumbs/placeholder.txt
+Presentation/Nop.Web/wwwroot/images/uploaded/*
+!Presentation/Nop.Web/wwwroot/images/uploaded/placeholder.txt
+Presentation/Nop.Web/wwwroot/files/exportimport/*
+!Presentation/Nop.Web/wwwroot/files/exportimport/Index.htm
+Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/*
+!Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/en/
+!Presentation/Nop.Web/wwwroot/lib_npm/cldr-data/main/main.zip
+Presentation/Nop.Web/wwwroot/sitemaps/*
+!Presentation/Nop.Web/wwwroot/sitemaps/Index.htm
+
+# Global packages
+packages/
+Tests/Nop.Tests/Connections.resx

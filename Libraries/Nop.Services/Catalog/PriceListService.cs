@@ -38,14 +38,16 @@ namespace Nop.Services.Catalog
         }
         public async Task<decimal?> GetPriceByProductAndPriceListAsync(int productId, int priceListId)
         {
-            // Шукаємо запис, де збігається і товар, і прайс-лист
             var priceListItems = await _listItemRepository.GetAllAsync(query =>
                 query.Where(p => p.ProductId == productId && p.PriceListId == priceListId));
 
-            // Беремо перший знайдений елемент (або null, якщо такого товару в прайсі немає)
             var item = priceListItems.FirstOrDefault();
 
             return item?.Price;
+        }
+        public virtual async Task<IList<PriceList>> GetAllPriceListsAsync()
+        {
+            return await _repository.GetAllAsync(query => query);
         }
     }
 }

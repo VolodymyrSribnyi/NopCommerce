@@ -97,6 +97,7 @@ public partial class CustomerRoleController : BaseAdminController
         if (ModelState.IsValid)
         {
             var customerRole = model.ToEntity<CustomerRole>();
+            customerRole.PriceListId = model.PriceListId > 0 ? model.PriceListId : null;
             await _customerService.InsertCustomerRoleAsync(customerRole);
 
             //activity log
@@ -155,6 +156,7 @@ public partial class CustomerRoleController : BaseAdminController
                     throw new NopException(await _localizationService.GetResourceAsync("Admin.Customers.CustomerRoles.Fields.PurchasedWithProduct.Registered"));
 
                 customerRole = model.ToEntity(customerRole);
+                customerRole.PriceListId = model.PriceListId > 0 ? model.PriceListId : null;
                 await _customerService.UpdateCustomerRoleAsync(customerRole);
 
                 //activity log

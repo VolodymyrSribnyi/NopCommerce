@@ -13,6 +13,7 @@ public partial record CustomerRoleModel : BaseNopEntityModel
 
     public CustomerRoleModel()
     {
+        AvailablePriceLists = new List<SelectListItem>();
         TaxDisplayTypeValues = new List<SelectListItem>();
     }
 
@@ -55,5 +56,9 @@ public partial record CustomerRoleModel : BaseNopEntityModel
     [NopResourceDisplayName("Admin.Customers.CustomerRoles.Fields.PurchasedWithProduct")]
     public string PurchasedWithProductName { get; set; }
 
+    [NopResourceDisplayName("Admin.Customers.CustomerRoles.Fields.PriceList")]
+    public int? PriceListId {get;set;}
+
+    public IList<SelectListItem> AvailablePriceLists { get; set; }
     #endregion
 }

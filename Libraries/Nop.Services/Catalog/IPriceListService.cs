@@ -14,5 +14,6 @@ namespace Nop.Services.Catalog
         Task<PriceList> GetPriceListByIdAsync(int priceListId);
         Task<IList<PriceListItem>> GetPriceListItemsByPriceListIdAsync(int priceListId);
         Task<decimal?> GetPriceByProductAndPriceListAsync(int productId, int priceListId);
+        Task<IList<PriceList>> GetAllPriceListsAsync();
     }
 }

@@ -41,6 +41,7 @@ public partial class PriceCalculationService : IPriceCalculationService
         IDiscountService discountService,
         IManufacturerService manufacturerService,
         IProductAttributeParser productAttributeParser,
+        IPriceListService priceListService,
         IProductService productService,
         IStaticCacheManager staticCacheManager)
     {
@@ -52,6 +53,7 @@ public partial class PriceCalculationService : IPriceCalculationService
         _discountService = discountService;
         _manufacturerService = manufacturerService;
         _productAttributeParser = productAttributeParser;
+        _priceService = priceListService;
         _productService = productService;
         _staticCacheManager = staticCacheManager;
     }
@@ -360,6 +362,11 @@ public partial class PriceCalculationService : IPriceCalculationService
         DateTime? rentalEndDate)
     {
         ArgumentNullException.ThrowIfNull(product);
+        var customPriceListPrice = await GetPriceListPriceAsync(product, customer);
+
+        decimal initialPrice = customPriceListPrice.HasValue
+                ? customPriceListPrice.Value
+                : product.Price;
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductPriceCacheKey,
             product,
@@ -372,7 +379,7 @@ public partial class PriceCalculationService : IPriceCalculationService
 
         //we do not cache price if this not allowed by settings or if the product is rental product
         //otherwise, it can cause memory leaks (to store all possible date period combinations)
-        if (!_catalogSettings.CacheProductPrices || product.IsRental)
+        if (!_catalogSettings.CacheProductPrices || product.IsRental || customPriceListPrice.HasValue)
             cacheKey.CacheTime = 0;
 
         decimal rezPrice;
@@ -386,7 +393,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             var appliedDiscountAmount = decimal.Zero;
 
             //initial price
-            var price = overriddenProductPrice ?? product.Price;
+            var price = overriddenProductPrice ?? initialPrice;
 
             //tier prices
             var tierPrice = await _productService.GetPreferredTierPriceAsync(product, customer, store, quantity);

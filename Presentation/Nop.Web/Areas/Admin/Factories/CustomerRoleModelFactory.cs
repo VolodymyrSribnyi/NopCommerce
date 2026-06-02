@@ -1,4 +1,5 @@
-﻿using Nop.Core;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Nop.Core;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Catalog;
@@ -21,6 +22,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
     protected readonly ICustomerService _customerService;
     protected readonly IProductService _productService;
+    protected readonly IPriceListService _priceListService;
     protected readonly IUrlRecordService _urlRecordService;
     protected readonly IWorkContext _workContext;
 
@@ -31,12 +33,14 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     public CustomerRoleModelFactory(IBaseAdminModelFactory baseAdminModelFactory,
         ICustomerService customerService,
         IProductService productService,
+        IPriceListService priceListService,
         IUrlRecordService urlRecordService,
         IWorkContext workContext)
     {
         _baseAdminModelFactory = baseAdminModelFactory;
         _customerService = customerService;
         _productService = productService;
+        _priceListService = priceListService;
         _urlRecordService = urlRecordService;
         _workContext = workContext;
     }
@@ -113,6 +117,16 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             //fill in model values from the entity
             model ??= customerRole.ToModel<CustomerRoleModel>();
             model.PurchasedWithProductName = (await _productService.GetProductByIdAsync(customerRole.PurchasedWithProductId))?.Name;
+            model.PriceListId = customerRole?.PriceListId;
+            var priceLists = await _priceListService.GetAllPriceListsAsync();
+            model.AvailablePriceLists = priceLists.Select(pl => new SelectListItem
+            {
+                Text = pl.Name,
+                Value = pl.Id.ToString(),
+                Selected = pl.Id == model.PriceListId
+            }).ToList();
+
+            model.AvailablePriceLists.Insert(0, new SelectListItem { Text = "None", Value = "0" });
         }
 
         //set default values for the new model

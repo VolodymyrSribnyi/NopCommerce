@@ -385,7 +385,8 @@ public partial class CustomerController : BaseAdminController
             if (_customerSettings.FaxEnabled)
                 customer.Fax = model.Fax;
             customer.CustomCustomerAttributesXML = customerAttributesXml;
-
+            customer.PriceListId = model.PriceListId > 0 ? model.PriceListId : null;
+            
             await _customerService.InsertCustomerAsync(customer);
 
             //password
@@ -624,6 +625,8 @@ public partial class CustomerController : BaseAdminController
                             await _customerService.RemoveCustomerRoleMappingAsync(customer, customerRole);
                     }
                 }
+
+                customer.PriceListId = model.PriceListId > 0 ? model.PriceListId : null;
 
                 await _customerService.UpdateCustomerAsync(customer);
 
