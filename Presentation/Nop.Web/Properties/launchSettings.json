@@ -13,7 +13,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "sslPort": 5001
+      "sslPort": 59579
     }
   }
 }
