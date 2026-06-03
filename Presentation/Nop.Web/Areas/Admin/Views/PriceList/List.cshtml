@@ -1,0 +1,107 @@
+﻿
+@using Nop.Web.Framework.Extensions
+@using Nop.Web.Framework.Infrastructure
+@using Nop.Web.Areas.Admin.Models.Catalog
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Nop.Web.Framework
+
+@model PriceListSearchModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewBag.PageTitle = "Прайс-листи";
+    NopHtml.SetActiveMenuItemSystemName("PriceLists");
+}
+
+<form asp-controller="PriceList" asp-action="List" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            Прайс-листи
+        </h1>
+        <div class="float-right">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus-square"></i>
+                Додати новий
+            </a>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+
+                <div class="cards-group">
+                    <div class="card card-default card-search">
+                        <div class="card-body">
+                            <div class="row search-row opened">
+                                <div class="search-text">Фільтри пошуку</div>
+                                <div class="icon-search"><i class="fas fa-search" aria-hidden="true"></i></div>
+                            </div>
+                            <div class="search-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <nop-label asp-for="PriceListName" />
+                                            </div>
+                                            <div class="col-md-8">
+                                                <nop-editor asp-for="PriceListName" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-8 offset-md-4">
+                                                <button type="button" id="search-pricelists" class="btn btn-primary btn-search">
+                                                    <i class="fas fa-search"></i>
+                                                    Пошук
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-default">
+                        <div class="card-body">
+                            @await Html.PartialAsync("Table", new DataTablesModel
+                            {
+                                Name = "pricelists-grid",
+                                                        UrlRead = new DataUrl(Url.Action("GetPriceListTable", "PriceList")),
+                                                        SearchButtonId = "search-pricelists",
+                                                        Length = Model.PageSize,
+                                                        LengthMenu = Model.AvailablePageSizes,
+                                                        Filters = new List<FilterParameter>
+                                                        {
+                                                        new FilterParameter(nameof(Model.PriceListName))
+                                                        },
+                                                        ColumnCollection = new List<ColumnProperty>
+                                                        {
+                                                        new ColumnProperty(nameof(PriceListModel.Name))
+                                                        {
+                                                        Title = "Назва прайс-листа",
+                                                        Width = "400"
+                                                        },
+                                                        new ColumnProperty(nameof(PriceListModel.CurrencyId))
+                                                        {
+                                                        Title = "ID Валюти",
+                                                        Width = "150"
+                                                        },
+                                                        new ColumnProperty(nameof(PriceListModel.Id))
+                                                        {
+                                                        Title = "Редагувати",
+                                                        Width = "100",
+                                                        ClassName =  NopColumnClassDefaults.Button,
+                                                        Render = new RenderButtonEdit(new DataUrl("~/Admin/PriceList/Edit/"))
+                                                        }
+                                                        }
+                                                        })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</form>

@@ -1,0 +1,70 @@
+﻿@model PriceListModel
+
+@using Nop.Web.Framework.Models.DataTables
+@using Nop.Web.Framework.Extensions
+@using Nop.Web.Framework.Infrastructure
+@using Nop.Web.Areas.Admin.Models.Catalog
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Nop.Web.Framework
+
+@{
+    Layout = "_AdminLayout";
+    ViewBag.PageTitle = "Додати новий прайс-лист";
+    NopHtml.SetActiveMenuItemSystemName("PriceLists");
+}
+
+<form asp-controller="PriceList" asp-action="Create" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            Додати новий прайс-лист
+            <small>
+                <i class="fas fa-arrow-circle-left"></i>
+                <a asp-action="List">повернутися до списку</a>
+            </small>
+        </h1>
+        <div class="float-right">
+            <button type="submit" name="save" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                Зберегти
+            </button>
+            <button type="submit" name="save-continue" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                Зберегти та продовжити
+            </button>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                <div asp-validation-summary="All"></div>
+
+                <div class="cards-group">
+                    <div class="card card-default">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Name" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="Name" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="CurrencyId" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="CurrencyId" />
+                                    <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

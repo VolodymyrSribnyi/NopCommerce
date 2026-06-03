@@ -1,0 +1,94 @@
+﻿@model PriceListModel
+
+@using Nop.Web.Framework.Models.DataTables
+@using Nop.Web.Framework.Extensions
+@using Nop.Web.Framework.Infrastructure
+@using Nop.Web.Areas.Admin.Models.Catalog
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Nop.Web.Framework
+
+@{
+    Layout = "_AdminLayout";
+    ViewBag.PageTitle = "Редагувати прайс-лист";
+    NopHtml.SetActiveMenuItemSystemName("PriceLists");
+}
+
+<form asp-controller="PriceList" asp-action="Edit" method="post">
+    <div class="content-header clearfix">
+        <h1 class="float-left">
+            Редагувати прайс-лист - @Model.Name
+            <small>
+                <i class="fas fa-arrow-circle-left"></i>
+                <a asp-action="List">повернутися до списку</a>
+            </small>
+        </h1>
+        <div class="float-right">
+            <button type="submit" name="save" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                Зберегти
+            </button>
+            <button type="submit" name="save-continue" class="btn btn-primary">
+                <i class="far fa-save"></i>
+                Зберегти та продовжити
+            </button>
+            <span id="price-list-delete" class="btn btn-danger">
+                <i class="far fa-trash-alt"></i>
+                Видалити
+            </span>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="form-horizontal">
+                @* Обов'язково ховаємо ID, щоб POST-метод знав, що ми редагуємо *@
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="All"></div>
+
+                <div class="cards-group">
+                    <div class="card card-default">
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="Name" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="Name" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <nop-label asp-for="CurrencyId" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="CurrencyId" />
+                                    <span asp-validation-for="CurrencyId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>
+<section class="content">
+    <div class="container-fluid">
+        <div class="form-horizontal">
+            @* Основна картка з Назвою та Валютою *@
+            <div class="cards-group">
+                @* Твій існуючий блок <div class="card card-default"> ... </div> *@
+
+                
+                <partial name="_CreateOrUpdate.Items" model="Model" />
+            </div>
+        </div>
+    </div>
+</section>
+@* Модальне вікно підтвердження видалення *@
+<span id="price-list-delete" class="btn btn-danger float-right">
+    <i class="fas fa-trash-alt"></i> Видалити
+</span>
+<nop-delete-confirmation ast-button-id="price-list-delete" ast-action="Delete" />
