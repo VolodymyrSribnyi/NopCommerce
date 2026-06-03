@@ -27,6 +27,7 @@ public partial class PriceCalculationService : IPriceCalculationService
     protected readonly IProductAttributeParser _productAttributeParser;
     protected readonly IProductService _productService;
     protected readonly IStaticCacheManager _staticCacheManager;
+    protected readonly IPriceListService _priceService;
 
     #endregion
 
@@ -40,6 +41,7 @@ public partial class PriceCalculationService : IPriceCalculationService
         IDiscountService discountService,
         IManufacturerService manufacturerService,
         IProductAttributeParser productAttributeParser,
+        IPriceListService priceListService,
         IProductService productService,
         IStaticCacheManager staticCacheManager)
     {
@@ -51,6 +53,7 @@ public partial class PriceCalculationService : IPriceCalculationService
         _discountService = discountService;
         _manufacturerService = manufacturerService;
         _productAttributeParser = productAttributeParser;
+        _priceService = priceListService;
         _productService = productService;
         _staticCacheManager = staticCacheManager;
     }
@@ -252,7 +255,33 @@ public partial class PriceCalculationService : IPriceCalculationService
     #endregion
 
     #region Methods
+    public virtual async Task<decimal?> GetPriceListPriceAsync(Product product, Customer customer)
+    {
+        if (product == null || customer == null)
+            return null;
 
+        if (customer.PriceListId.HasValue)
+        {
+            var customPrice = await _priceService.GetPriceByProductAndPriceListAsync(product.Id, customer.PriceListId.Value);
+
+            if (customPrice.HasValue)
+                return customPrice;
+        }
+
+        var customerRoles = await _customerService.GetCustomerRolesAsync(customer);
+
+        foreach (var role in customerRoles.Where(cr => cr.Active))
+        {
+            if (role.PriceListId.HasValue)
+            {
+                var rolePrice = await _priceService.GetPriceByProductAndPriceListAsync(product.Id, role.PriceListId.Value);
+                if (rolePrice.HasValue)
+                    return rolePrice; // Повертаємо першу знайдену ціну за роллю
+            }
+        }
+
+        return null;
+    }
     /// <summary>
     /// Gets the final price
     /// </summary>
@@ -333,6 +362,11 @@ public partial class PriceCalculationService : IPriceCalculationService
         DateTime? rentalEndDate)
     {
         ArgumentNullException.ThrowIfNull(product);
+        var customPriceListPrice = await GetPriceListPriceAsync(product, customer);
+
+        decimal initialPrice = customPriceListPrice.HasValue
+                ? customPriceListPrice.Value
+                : product.Price;
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductPriceCacheKey,
             product,
@@ -345,7 +379,7 @@ public partial class PriceCalculationService : IPriceCalculationService
 
         //we do not cache price if this not allowed by settings or if the product is rental product
         //otherwise, it can cause memory leaks (to store all possible date period combinations)
-        if (!_catalogSettings.CacheProductPrices || product.IsRental)
+        if (!_catalogSettings.CacheProductPrices || product.IsRental || customPriceListPrice.HasValue)
             cacheKey.CacheTime = 0;
 
         decimal rezPrice;
@@ -359,7 +393,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             var appliedDiscountAmount = decimal.Zero;
 
             //initial price
-            var price = overriddenProductPrice ?? product.Price;
+            var price = overriddenProductPrice ?? initialPrice;
 
             //tier prices
             var tierPrice = await _productService.GetPreferredTierPriceAsync(product, customer, store, quantity);

@@ -50,5 +50,18 @@ namespace Nop.Services.Catalog
 
             await _repository.DeleteAsync(priceList);
         }
+        public async Task<decimal?> GetPriceByProductAndPriceListAsync(int productId, int priceListId)
+        {
+            var priceListItems = await _listItemRepository.GetAllAsync(query =>
+                query.Where(p => p.ProductId == productId && p.PriceListId == priceListId));
+
+            var item = priceListItems.FirstOrDefault();
+
+            return item?.Price;
+        }
+        public virtual async Task<IList<PriceList>> GetAllPriceListsAsync()
+        {
+            return await _repository.GetAllAsync(query => query);
+        }
     }
 }

@@ -25,6 +25,7 @@ public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+        AvailablePriceLists = new List<SelectListItem>();
         CustomerAttributes = new List<CustomerAttributeModel>();
         AddRewardPoints = new AddRewardPointsToCustomerModel();
         CustomerRewardPointsSearchModel = new CustomerRewardPointsSearchModel();
@@ -56,6 +57,9 @@ public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
     [NopResourceDisplayName("Admin.Customers.Customers.Fields.Vendor")]
     public int VendorId { get; set; }
 
+    [NopResourceDisplayName("Admin.Customers.Customers.Fields.PriceList")]
+    public int? PriceListId {get; set;}
+    public IList<SelectListItem> AvailablePriceLists {get; set;}
     public IList<SelectListItem> AvailableVendors { get; set; }
 
     //form fields & properties

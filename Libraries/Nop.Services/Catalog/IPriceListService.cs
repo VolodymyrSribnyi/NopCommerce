@@ -13,6 +13,9 @@ namespace Nop.Services.Catalog
         Task InsertPriceListAsync(PriceList priceList);
         Task UpdatePriceListAsync(PriceList priceList);
         Task<PriceList> GetPriceListByIdAsync(int priceListId);
+        Task<IList<PriceListItem>> GetPriceListItemsByPriceListIdAsync(int priceListId);
+        Task<decimal?> GetPriceByProductAndPriceListAsync(int productId, int priceListId);
+        Task<IList<PriceList>> GetAllPriceListsAsync();
         Task<IPagedList<PriceList>> GetAllPriceListAsync(string name, int pageIndex, int pageSize);
         Task DeletePriceListAsync(PriceList priceList);
     }

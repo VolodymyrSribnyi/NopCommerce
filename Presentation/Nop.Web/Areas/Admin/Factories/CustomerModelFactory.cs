@@ -65,6 +65,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     protected readonly ILocalizationService _localizationService;
     protected readonly IOrderService _orderService;
     protected readonly IPictureService _pictureService;
+    protected readonly IPriceListService _priceListService;
     protected readonly IPriceFormatter _priceFormatter;
     protected readonly IProductAttributeFormatter _productAttributeFormatter;
     protected readonly IProductService _productService;
@@ -109,6 +110,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         ILocalizationService localizationService,
         IOrderService orderService,
         IPictureService pictureService,
+        IPriceListService priceListService,
         IPriceFormatter priceFormatter,
         IProductAttributeFormatter productAttributeFormatter,
         IProductService productService,
@@ -149,6 +151,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         _localizationService = localizationService;
         _orderService = orderService;
         _pictureService = pictureService;
+        _priceListService = priceListService;
         _priceFormatter = priceFormatter;
         _productAttributeFormatter = productAttributeFormatter;
         _productService = productService;
@@ -668,6 +671,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 model.Email = customer.Email;
                 model.Username = customer.Username;
                 model.VendorId = customer.VendorId;
+                model.PriceListId = customer?.PriceListId;
                 model.AdminComment = customer.AdminComment;
                 model.IsTaxExempt = customer.IsTaxExempt;
                 model.Active = customer.Active;
@@ -707,6 +711,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                     model.AffiliateId = affiliate.Id;
                     model.AffiliateName = await _affiliateService.GetAffiliateFullNameAsync(affiliate);
                 }
+                var priceLists = await _priceListService.GetAllPriceListsAsync();
+                model.AvailablePriceLists = priceLists.Select(pl => new SelectListItem
+                {
+                    Text = pl.Name,
+                    Value = pl.Id.ToString(),
+                    Selected = pl.Id == model.PriceListId
+                }).ToList();
+                
+                model.AvailablePriceLists.Insert(0, new SelectListItem { 
+                Text = await _localizationService.GetResourceAsync("Admin.Common.None"), 
+                Value = "0" 
+            });
             }
             //prepare reward points model
             model.DisplayRewardPointsHistory = _rewardPointsSettings.Enabled;
