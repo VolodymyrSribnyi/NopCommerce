@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using Nop.Data;
 using System;
 using System.Collections.Generic;
@@ -11,18 +12,23 @@ namespace Nop.Services.Catalog
     public class PriceListService:IPriceListService
     {
         private readonly IRepository<PriceList> _repository;
-        private readonly IRepository<PriceListItem> _listItemRepository;
-        public PriceListService(IRepository<PriceList> repository, IRepository<PriceListItem> listItemRepository)
+        
+        public PriceListService(IRepository<PriceList> repository)
         {
-            _repository = repository;
-            _listItemRepository = listItemRepository;
+            _repository = repository; 
         }
         public async Task InsertPriceListAsync(PriceList priceList)
         {
+            if (priceList == null)
+                throw new ArgumentNullException(nameof(priceList));
+
             await _repository.InsertAsync(priceList);
         }
         public async Task UpdatePriceListAsync(PriceList priceList)
         {
+            if (priceList == null)
+                throw new ArgumentNullException(nameof(priceList));
+
             await _repository.UpdateAsync(priceList);
             
         }
@@ -31,10 +37,18 @@ namespace Nop.Services.Catalog
             var priceList=await _repository.GetByIdAsync(priceListId);
             return priceList;
         }
-        public async Task<IList<PriceListItem>>GetPriceListItemsByPriceListIdAsync(int priceListId)
+        public async Task<IPagedList<PriceList>> GetAllPriceListAsync(string name, int pageIndex, int pageSize)
         {
-            var priceListItems = await _listItemRepository.GetAllAsync(query=>query.Where(p=> p.PriceListId==priceListId));
-            return priceListItems;
+            var priceListList = await _repository.GetAllPagedAsync(query=> query.Where(p=> string.IsNullOrEmpty(name) || p.Name.Contains(name)), pageIndex, pageSize);
+            return priceListList;
+        }
+
+        public async Task DeletePriceListAsync(PriceList priceList)
+        {
+            if (priceList == null)
+                throw new ArgumentNullException(nameof(priceList));
+
+            await _repository.DeleteAsync(priceList);
         }
     }
 }

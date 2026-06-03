@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Catalog;
+﻿using Nop.Core;
+using Nop.Core.Domain.Catalog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Nop.Services.Catalog
         Task InsertPriceListAsync(PriceList priceList);
         Task UpdatePriceListAsync(PriceList priceList);
         Task<PriceList> GetPriceListByIdAsync(int priceListId);
-        Task<IList<PriceListItem>> GetPriceListItemsByPriceListIdAsync(int priceListId);
+        Task<IPagedList<PriceList>> GetAllPriceListAsync(string name, int pageIndex, int pageSize);
+        Task DeletePriceListAsync(PriceList priceList);
     }
 }
