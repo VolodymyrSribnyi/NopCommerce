@@ -1,88 +1,81 @@
 ﻿@model PriceListModel
 @using Nop.Web.Framework.Models.DataTables
+@using Nop.Web.Areas.Admin.Models.Catalog
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Nop.Web.Framework
 
 <div class="card card-default">
     <div class="card-header font-weight-bold">
         <div class="card-title">
-            <i class="fas fa-list"></i>
-            Товари у прайс-листі
+            <i class="fas fa-list"></i> Товари у прайс-листі
         </div>
-        @if (Model.Id > 0)
-        {
-            @* Кнопка для відкриття вікна з вибором товарів каталогу *@
-            <div class="card-tools pl-2">
-                <button type="submit" id="btnAddNewProduct"
-                        class="btn btn-primary"
-                        onclick="javascript:OpenWindow('@Url.Action("ProductAddPopup", "PriceList", new { priceListId = Model.Id, btnId = "btnRefreshItems" })', 800, 800, true); return false;">
-                    <i class="fas fa-plus-square"></i>
-                    Додати товар
-                </button>
-                @* Прихована кнопка. Попуп «клікне» по ній після закриття, щоб оновити таблицю *@
-                <button type="button" id="btnRefreshItems" style="display: none"></button>
-            </div>
-        }
+        <div class="card-tools">
+            <button type="button" class="btn btn-primary"
+                    onclick="javascript:OpenWindow('@Url.Action("ProductAddPopup", "PriceList", new { priceListId = Model.Id, btnId = "btnRefreshItems" })', 800, 800, true); return false;">
+                <i class="fas fa-plus-square"></i> Додати товар
+            </button>
+            <button type="button" id="btnRefreshItems" style="display: none"></button>
+        </div>
     </div>
     <div class="card-body">
-        @if (Model.Id > 0)
-        {
-            @await Html.PartialAsync("Table", new DataTablesModel
-            {
-                Name = "pricelistitems-grid",
-                UrlRead = new DataUrl("PriceListItemsList", "PriceList", new RouteValueDictionary { [nameof(PriceListItemSearchModel.PriceListId)] = Model.Id }),
-                UrlUpdate = new DataUrl("PriceListItemUpdate", "PriceList", null),
-                Length = Model.PriceListItemSearchModel.PageSize,
-                LengthMenu = Model.PriceListItemSearchModel.AvailablePageSizes,
-                ColumnCollection = new List<ColumnProperty>
-                {
-                new ColumnProperty(nameof(PriceListItemModel.ProductName))
-                {
-                Title = "Товар",
-                Width = "300"
-                },
-                new ColumnProperty(nameof(PriceListItemModel.Price))
-                {
-                Title = "Ціна",
-                Width = "150",
-                Editable = true,
-                EditType = EditType.Number
-                },
-                new ColumnProperty(nameof(PriceListItemModel.Id))
-                {
-                Title = "Видалити",
-                Width = "100",
-                ClassName = NopColumnClassDefaults.Button,
-                // Використовуємо універсальний RenderCustom, який просто згенерує HTML-кнопку
-                Render = new RenderCustom(@"
-                function(data, type, row) {
-                return '<button type=""button"" class=""btn btn-danger"" onclick=""deletePriceListItem(' + data + ')""><i class=""fas fa-trash""></i> Видалити</button>';
-                }")
-                }}})
+        @Html.AntiForgeryToken()
 
-        @* Скрипти для обробки оновлення та видалення *@
-        <script>
-            $(document).ready(function () {
-                // Оновлення таблиці після закриття спливаючого вікна
-                $('#btnRefreshItems').click(function () {
-                    updateTable('pricelistitems-grid');
-                    return false;
-                });
-            });
-
-            // Функція видалення товару з прайс-листа
-            function deletePriceListItem(id) {
-                if (confirm("Ви впевнені, що хочете видалити цей товар з прайс-листа?")) {
-                    postData('@Url.Action("PriceListItemDelete", "PriceList")', { id: id }, null, function() {
-                        updateTable('pricelistitems-grid');
-                    });
-                }
-            }
-        </script>
-                }
-        else
-        {
-            <div class="alert alert-info">
-                Спочатку збережіть прайс-лист, щоб мати можливість додавати до нього товари.
-            </div>
-        }
+        <nop-datatable asp-name="pricelist-items-grid"
+                       asp-url-read="@Url.Action("PriceListItemsList", "PriceList")"
+                       asp-length="@Model.PriceListItemSearchModel.PageSize"
+                       asp-length-menu="@Model.PriceListItemSearchModel.AvailablePageSizes"
+                       asp-data-func="bindPostData">
+            <nop-columns>
+                <nop-column asp-prop-name="ProductName" asp-title="Товар" />
+                <nop-column asp-prop-name="Price" asp-title="Ціна" asp-width="150" />
+                <nop-column asp-prop-name="Id" asp-title="Дії" asp-width="100" asp-render="renderDeleteButton" />
+            </nop-columns>
+        </nop-datatable>
     </div>
 </div>
+
+<script>
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        // Перевіряємо, чи це запит саме за нашими товарами
+        if (settings.url && settings.url.indexOf('PriceListItemsList') > -1) {
+            console.log("📦 ВІДПОВІДЬ СЕРВЕРА ПЕРЕХОПЛЕНО!");
+            console.log("СИРІ ДАНІ:", xhr.responseJSON || xhr.responseText);
+            
+            // ЗУПИНКА: Тепер дебагер спрацює саме тоді, коли прийдуть дані!
+            debugger; 
+        }
+    });
+    function bindPostData(data) {
+        data.PriceListId = @Model.Id;
+        addAntiForgeryToken(data);
+        return data;
+    }
+
+    function renderDeleteButton(data, type, row, meta) {
+        return '<button type="button" class="btn btn-danger" onclick="deleteItem(' + row.Id + ')"><i class="fas fa-trash"></i></button>';
+    }
+
+    $(document).ready(function () {
+        $('#btnRefreshItems').click(function () {
+            updateTable('#pricelist-items-grid');
+        });
+    });
+
+    function deleteItem(id) {
+        if (confirm("Видалити товар?")) {
+            var postData = { id: id };
+            addAntiForgeryToken(postData);
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@Url.Action("PriceListItemDelete", "PriceList")",
+                data: postData,
+                success: function (data) {
+                    updateTable('#pricelist-items-grid');
+                }
+            });
+        }
+    }
+</script>

@@ -53,40 +53,63 @@
     </section>
 </form>
 
-<script>
+<script asp-location="Footer">
     $(document).ready(function () {
-        $('#save-selected').click(function () {
-            // Збираємо всі відмічені чекбокси товарів
-            var selectedIds = [];
-            $('input[name=checkbox_products]:checked').each(function () {
-                selectedIds.push($(this).val());
-            });
+    console.log("JS завантажено, кнопка готова!"); // Перевірка 1
 
-            if (selectedIds.length === 0) {
-                alert("Будь ласка, виберіть хоча б один товар.");
-                return;
-            }
+    $('#save-selected').click(function (e) {
+    e.preventDefault();
+    console.log("Клік по кнопці спрацював!"); // Перевірка 2
 
-            // Відправляємо вибрані ID на збереження в контролер
-            var postData = {
-                priceListId: '@ViewBag.PriceListId',
-                selectedProductIds: selectedIds.join(',')
-            };
+    var selectedIds = [];
+    $('input[name=checkbox_products]:checked').each(function () {
+    selectedIds.push($(this).val());
+    });
 
-            addAntiForgeryToken(postData);
+    console.log("Вибрані ID: ", selectedIds); // Перевірка 3
 
-            $.ajax({
-                cache: false,
-                type: "POST",
-                url: "@Url.Action("SelectedProductAdd", "PriceList")",
-                data: postData,
-                success: function (data) {
-                    // Закриваємо попуп та оновлюємо батьківську таблицю
-                    try { window.opener.document.getElementById('@ViewBag.BtnId').click(); }
-                    catch (e) { }
-                    window.close();
-                }
-            });
-        });
+    if (selectedIds.length === 0) {
+    alert("Будь ласка, оберіть хоча б один товар.");
+    return;
+    }
+
+        var postData = {
+        selectedIds: selectedIds.join(','), // 👈 Змінили ключ тут!
+        priceListId: '@ViewBag.PriceListId'
+    };
+
+    // Надійно додаємо токен безпеки вручну, щоб не залежати від зовнішніх функцій
+    var token = $('input[name="__RequestVerificationToken"]').val();
+    if (token) {
+    postData['__RequestVerificationToken'] = token;
+    }
+
+    console.log("Дані готові до відправки: ", postData); // Перевірка 4
+    $.ajax({
+    cache: false,
+    type: "POST",
+    url: "@Url.Action("SelectedProductAdd", "PriceList")",
+    data: postData,
+    success: function (data) {
+    if (data.success) {
+    try {
+    // Оновлюємо батьківське вікно
+    window.opener.document.getElementById('@ViewBag.BtnId').click();
+    }
+    catch (err) {
+    console.error("Не вдалося оновити батьківське вікно:", err);
+    }
+    // Закриваємо попап
+    window.close();
+    } else {
+    alert("Помилка при збереженні товарів. Контролер повернув false.");
+    }
+    },
+    error: function (xhr, textStatus, errorThrown) {
+    console.error("Помилка AJAX:", errorThrown);
+    alert("Сталася помилка з'єднання: " + errorThrown);
+    }
+    });
+    });
     });
 </script>

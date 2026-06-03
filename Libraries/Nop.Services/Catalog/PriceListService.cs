@@ -12,10 +12,13 @@ namespace Nop.Services.Catalog
     public class PriceListService:IPriceListService
     {
         private readonly IRepository<PriceList> _repository;
-        
-        public PriceListService(IRepository<PriceList> repository)
+        private readonly IRepository<PriceListItem> _listItemRepository;
+
+
+        public PriceListService(IRepository<PriceList> repository, IRepository<PriceListItem> listItemRepository)
         {
-            _repository = repository; 
+            _repository = repository;
+            _listItemRepository = listItemRepository;
         }
         public async Task InsertPriceListAsync(PriceList priceList)
         {
@@ -62,6 +65,11 @@ namespace Nop.Services.Catalog
         public virtual async Task<IList<PriceList>> GetAllPriceListsAsync()
         {
             return await _repository.GetAllAsync(query => query);
+        }
+
+        public Task<IList<PriceListItem>> GetPriceListItemsByPriceListIdAsync(int priceListId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
