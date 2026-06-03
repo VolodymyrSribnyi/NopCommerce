@@ -15,7 +15,7 @@ namespace Nop.Data.Mapping.Builders.Catalog
         public override void MapEntity(CreateTableExpressionBuilder table)
         {
             table
-                .WithColumn(nameof(PriceListItem.Id)).AsInt32().NotNullable().PrimaryKey()
+                .WithColumn(nameof(PriceListItem.Id)).AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn(nameof(PriceListItem.PriceListId)).AsInt32().NotNullable().ForeignKey(nameof(PriceList), "Id").OnDelete(System.Data.Rule.Cascade)
                 .WithColumn(nameof(PriceListItem.ProductId)).AsInt32().NotNullable().ForeignKey(nameof(Product), "Id").OnDelete(System.Data.Rule.None)
                 .WithColumn(nameof(PriceListItem.Price)).AsDecimal(18,4).NotNullable();

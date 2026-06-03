@@ -16,7 +16,7 @@ namespace Nop.Data.Mapping.Builders.Catalog
         public override void MapEntity(CreateTableExpressionBuilder table)
         {
             table
-                .WithColumn(nameof(PriceList.Id)).AsInt32().NotNullable().PrimaryKey()
+                .WithColumn(nameof(PriceList.Id)).AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn(nameof(PriceList.Name)).AsString(400).NotNullable()
                 .WithColumn(nameof(PriceList.CurrencyId)).AsInt32().NotNullable().ForeignKey(nameof(Currency), "Id");
         }
